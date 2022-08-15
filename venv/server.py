@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sqlitedb.file"
-app.config["SQL_TRACK_MODIFICATIONS"] = 0
+app.config["SQL_TRACK_MODIFICATIONS"] = False
 
 # configure sqlite3 to enforce foreign key constraints
 event.listens_for(Engine, "connect")
@@ -52,7 +52,16 @@ app.route("/user", methods=["POST"])
 
 
 def create_user():
-    pass
+    data = request.get_json()
+    new_user = User(
+        name=data["name"],
+        email=data["email"],
+        address=data["address"],
+        phone=data["phone"]
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User created"}), 200
 
 
 app.route("/user/descending_id", methods=["GET"])
