@@ -9,13 +9,13 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sqlitedb.file"
-app.config["SQL_TRACK_MODIFICATIONS"] = 0
+app.config["SQL_TRACK_MODIFICATIONS"] = False
 
 # configure sqlite3 to enforce foreign key constraints
 event.listens_for(Engine, "connect")
 
 
-def _set_sqlite_pragma(dbapi_connection, connection_record):
+def set_sqlite_pragma(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
@@ -57,7 +57,7 @@ def create_user():
         name=data["name"],
         email=data["email"],
         address=data["address"],
-        phone=data["phone"]
+        phone=data["phone"],
     )
     db.session.add(new_user)
     db.session.commit()
