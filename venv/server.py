@@ -48,7 +48,7 @@ class BlogPost(db.Model):
 
 
 # routes
-app.route("/user", method=["POST"])
+app.route("/user", methods=["POST"])
 
 
 def create_user():
