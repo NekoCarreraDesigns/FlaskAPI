@@ -4,6 +4,7 @@ from sqlalchemy.engine import Engine
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import linked_list
 
 # app
 app = Flask(__name__)
@@ -12,9 +13,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///sqlitedb.file"
 app.config["SQL_TRACK_MODIFICATIONS"] = False
 
 # configure sqlite3 to enforce foreign key constraints
-event.listens_for(Engine, "connect")
 
 
+@event.listens_for(Engine, "connect")
 def _set_sqlite_pragma(dbapi_connection, connection_record):
     if isinstance(dbapi_connection, SQLite3Connection):
         cursor = dbapi_connection.cursor()
@@ -48,9 +49,7 @@ class BlogPost(db.Model):
 
 
 # routes
-app.route("/user", methods=["POST"])
-
-
+@app.route("/user", methods=["POST"])
 def create_user():
     data = request.get_json()
     new_user = User(
@@ -64,58 +63,56 @@ def create_user():
     return jsonify({"message": "User created"}), 200
 
 
-app.route("/user/descending_id", methods=["GET"])
-
-
+@app.route("/user/descending_id", methods=["GET"])
 def get_all_users_descending():
-    pass
+    users = User.query.all()
+    all_users_ll = linked_list.LinkedList()
+
+    for user in users:
+        all_users_ll.insert_beginning(
+            {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "address": user.address,
+                "phone": user.phone
+            }
+        )
+
+    return jsonify(all_users_ll.to_list()), 200
 
 
-app.route("/user/ascending_id", methods=["GET"])
-
-
+@app.route("/user/ascending_id", methods=["GET"])
 def get_all_users_ascending():
     pass
 
 
-app.route("/user/<user_id>", methods=["GET"])
-
-
+@app.route("/user/<user_id>", methods=["GET"])
 def get_one_user(user_id):
     pass
 
 
-app.route("/user/<user_id>", methods=["DELETE"])
-
-
+@app.route("/user/<user_id>", methods=["DELETE"])
 def delete_user(user_id):
     pass
 
 
-app.route("/user/<user_id>", methods=["POST"])
-
-
+@app.route("/user/<user_id>", methods=["POST"])
 def create_blog_post(user_id):
     pass
 
 
-app.route("/user/<blog_post_id>", methods=["GET"])
-
-
+@app.route("/user/<blog_post_id>", methods=["GET"])
 def get_all_blog_posts(blog_post_id):
     pass
 
 
-app.route("/user/<blog_post_id>", methods=["GET"])
-
-
+@app.route("/user/<blog_post_id>", methods=["GET"])
 def get_one_blog_post(blog_post_id):
     pass
 
 
-app.route("/user/<blog_post_id>", methods=["DELETE"])
-
-
+@app.route("/user/<blog_post_id>", methods=["DELETE"])
 def delete_blog_post(blog_post_id):
     pass
 
